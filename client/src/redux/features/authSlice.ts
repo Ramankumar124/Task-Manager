@@ -5,18 +5,20 @@ import axios from "axios";
 
 
 export interface User {
-  id: string;
-  fullName: string;
-  userName:string;
-  email: string;
-  isEmailVerified: boolean;
-  avatar: {
-    public_id: string;
-    url: string;
-    _id: string;
-  };
-  createdAt:Date
-}
+    
+      _id: string;
+      userName: string;
+      email: string;
+      Tasks: object[];
+      avatar: {
+        public_id: string;
+        url: string;
+        _id: string;
+      };
+      createdAt: string;
+      updatedAt: string;
+    }
+
 
 interface AuthSliceState {
   loader: boolean;

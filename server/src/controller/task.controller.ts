@@ -23,7 +23,7 @@ const createTask = asyncHandler(
       priority,
       status,
       dueDate,
-      user: userId,
+      userId,
     });
 
     if (!newTask) {

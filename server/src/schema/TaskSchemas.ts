@@ -1,7 +1,7 @@
 import * as yup from "yup";
 
 
-export const createTaskSchema = yup.object().shape({
+export const TaskSchema = yup.object().shape({
   title: yup
     .string()
     .required("Title is required")

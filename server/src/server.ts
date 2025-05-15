@@ -1,5 +1,4 @@
 import http from "http";
-// Try with explicit extension
 import app from "./app";
 import dotenv from "dotenv";
 import { DBConnection } from "./database";

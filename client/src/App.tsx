@@ -8,24 +8,22 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
 import MainLayout from "./layouts/MainLayout";
-import AuthLayout from "./layouts/AuthLayout";
 
 import Dashboard from "./pages/Dashboard";
-import AddTask from "./pages/AddTask";
-import EditTask from "./pages/EditTask";
+import AddTask from "./pages/task/AddTask";
+import EditTask from "./pages/task/EditTask";
 import Profile from "./pages/Profile";
+import LoginPage from "./pages/auth/LoginPage";
+import RegisterPage from "./pages/auth/RegisterPage";
 
-import AuthPage from "./pages/AuthPage";
 
 function App() {
   return (
     <Router>
       <Routes>
-
-        <Route path="/auth" element={<AuthLayout />}>
-          <Route index element={<AuthPage />} />
-          <Route path="login" element={<AuthPage />} />
-          <Route path="register" element={<AuthPage />} />
+          <Route>
+          <Route path="login" element={<LoginPage />} />
+          <Route path="register" element={<RegisterPage />} />
         </Route>
 
         {/* Protected routes with sidebar */}
