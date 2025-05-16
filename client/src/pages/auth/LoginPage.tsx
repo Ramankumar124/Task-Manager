@@ -4,21 +4,25 @@ import { useNavigate } from "react-router-dom";
 import { Mail, Lock, ArrowRight, Eye, EyeOff, Zap } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { loginSchema } from "@/schemas/authSchema";
+import { loginSchema } from "@/types/authSchema";
 import { userLogin } from "@/Service/apiService";
 import { setUserData } from "@/redux/features/authSlice";
 import toast from "react-hot-toast";
+import type { TaskData } from "@/types/taskTypes";
 interface LoginFormInputs {
   email: string;
   password: string;
 }
+
+
+
 type loginRes = {
   message: string;
   data: {
     _id: string;
     userName: string;
     email: string;
-    Tasks: object[];
+    Tasks: TaskData[];
     avatar: {
       public_id: string;
       url: string;
@@ -50,10 +54,10 @@ const LoginPage = () => {
     try {
       const response = (await userLogin(data)) as { data: loginRes };
       if (response?.data?.data) {
+        const userData = response?.data?.data;
+        dispatch(setUserData(userData));
         toast.success(`${response?.data?.message}`);
-        dispatch(setUserData(response?.data?.data));
         navigate("/dashboard");
-        console.log(response.data.data);
       }
     } catch (error: any) {
       toast.error(error?.response?.data?.message || error?.message);
@@ -138,7 +142,7 @@ const LoginPage = () => {
 
               <p className="text-center text-gray-400 mt-2">
                 Don't have an account?{" "}
-               <a
+                <a
                   className="text-purple-400 hover:text-purple-300 no-underline hover:no-underline focus:no-underline"
                   href="/register"
                 >

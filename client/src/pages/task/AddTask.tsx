@@ -1,45 +1,22 @@
-import { Container, Row, Col, Button } from "react-bootstrap";
-import { useForm } from "react-hook-form";
+import { Container, Row, Col } from "react-bootstrap";
+import { useForm, type SubmitHandler } from "react-hook-form"; // Import SubmitHandler
+
 import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
+import { useAddTaskMutation } from "@/redux/api/tasksApi";
 import toast from "react-hot-toast";
-
-type Priority = "High" | "Medium" | "Low";
-type Status = "To Do" | "In Progress" | "Completed";
-
-interface TaskFormData {
-  title: string;
-  description: string;
-  dueDate: string | null | undefined;
-  priority: Priority;
-  status: Status;
-
-}
-
-const taskSchema = yup.object().shape({
-  title: yup.string().required("Task title is required"),
-  description: yup.string().required("Description is required"),
-  dueDate: yup.string().nullable(),
-  priority: yup
-    .string()
-    .oneOf(["High", "Medium", "Low"])
-    .required("Priority is required"),
-  status: yup
-    .string()
-    .oneOf(["To Do", "In Progress", "Completed"])
-    .required("Status is required"),
-});
+import { taskSchema } from "@/types/TaskSchema";
+import type { TaskFormData } from "@/types/taskTypes";
 
 const AddTask = () => {
   const navigate = useNavigate();
-
+  const [addTask] = useAddTaskMutation();
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<TaskFormData>({
-    resolver: yupResolver(taskSchema),
+    resolver: yupResolver(taskSchema) as any,
     defaultValues: {
       title: "",
       description: "",
@@ -49,11 +26,14 @@ const AddTask = () => {
     },
   });
 
-  // Watch the form values
-
-
-  const onSubmit = async (data: TaskFormData) => {
-
+  const onSubmit: SubmitHandler<TaskFormData> = async (data) => {
+    try {
+      await addTask(data).unwrap();
+      toast.success("Task Added succesfully");
+      navigate("/dashboard");
+    } catch (error: any) {
+      toast.error(error?.data?.message || error?.message);
+    }
   };
 
   return (
@@ -75,7 +55,7 @@ const AddTask = () => {
               {...register("title")}
             />
             {errors.title && (
-              <div className="invalid-feedback">{errors.title.message}</div>
+              <div className="  text-red-500">{errors.title.message}</div>
             )}
           </div>
 
@@ -91,9 +71,7 @@ const AddTask = () => {
               {...register("description")}
             />
             {errors.description && (
-              <div className="invalid-feedback">
-                {errors.description.message}
-              </div>
+              <div className="text-red-600">{errors.description.message}</div>
             )}
           </div>
 
@@ -108,9 +86,7 @@ const AddTask = () => {
                   {...register("dueDate")}
                 />
                 {errors.dueDate && (
-                  <div className="invalid-feedback">
-                    {errors.dueDate.message}
-                  </div>
+                  <div className="text-red-600">{errors.dueDate.message}</div>
                 )}
               </div>
             </Col>
@@ -127,9 +103,7 @@ const AddTask = () => {
                   <option value="Low">Low</option>
                 </select>
                 {errors.priority && (
-                  <div className="invalid-feedback">
-                    {errors.priority.message}
-                  </div>
+                  <div className="">{errors.priority.message}</div>
                 )}
               </div>
             </Col>
@@ -143,11 +117,9 @@ const AddTask = () => {
               <option value="Completed">Completed</option>
             </select>
             {errors.status && (
-              <div className="invalid-feedback">{errors.status.message}</div>
+              <div className=" text-red-700">{errors.status.message}</div>
             )}
           </div>
-
-       
 
           <div className="d-flex justify-content-end">
             <button

@@ -1,24 +1,22 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import type {PayloadAction} from "@reduxjs/toolkit"
+import type { PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 
-
+type Priority = "High" | "Medium" | "Low";
+type Status = "To Do" | "In Progress" | "Completed";
 
 export interface User {
-    
-      _id: string;
-      userName: string;
-      email: string;
-      Tasks: object[];
-      avatar: {
-        public_id: string;
-        url: string;
-        _id: string;
-      };
-      createdAt: string;
-      updatedAt: string;
-    }
-
+  _id: string;
+  userName: string;
+  email: string;
+  avatar: {
+    public_id: string;
+    url: string;
+    _id: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
 
 interface AuthSliceState {
   loader: boolean;
@@ -33,16 +31,15 @@ const initialState: AuthSliceState = {
 export const fetchUserData = createAsyncThunk(
   "auth/fetchUserData",
   async () => {
-    
     const response = await axios.get(`/auth/getUserData`, {
       withCredentials: true,
-      timeout:3000,
-    },);
+      timeout: 3000,
+    });
     return response.data.data;
   }
 );
 
- export const authSlice = createSlice({
+export const authSlice = createSlice({
   initialState,
   name: "auth",
   reducers: {
@@ -58,17 +55,17 @@ export const fetchUserData = createAsyncThunk(
   extraReducers: (builder) => {
     builder
       .addCase(fetchUserData.pending, (state) => {
-        state.loader = true; 
+        state.loader = true;
       })
       .addCase(fetchUserData.fulfilled, (state, action) => {
-        state.user = action.payload; 
-        state.loader = false; 
+        state.user = action.payload;
+        state.loader = false;
       })
       .addCase(fetchUserData.rejected, (state) => {
-        state.loader = false; 
-        state.user = null;  
+        state.loader = false;
+        state.user = null;
       });
   },
 });
 
-export const {setUserData,removeUserData} =authSlice.actions
+export const { setUserData, removeUserData } = authSlice.actions;

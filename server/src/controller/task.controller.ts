@@ -88,6 +88,8 @@ const getTaskById = asyncHandler(
 
 const updateTask = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
+    console.log(req.body);
+    
     const { id } = req.params;
     const { title, description, dueDate, priority, status } = req.body;
     // @ts-ignore

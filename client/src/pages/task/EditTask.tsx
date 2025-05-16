@@ -1,187 +1,248 @@
-import { useState } from "react";
-import { Container, Form, Button, Row, Col, Card } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import {
+  Container,
+  Row,
+  Col,
+  Form,
+  Button,
+  Card,
+  Spinner,
+  Modal,
+} from "react-bootstrap";
+import { useForm } from "react-hook-form";
+import {
+  useUpdateTaskMutation,
+  useDeleteTaskMutation,
+  useGetSingleTaskQuery,
+} from "@/redux/api/tasksApi";
+import { yupResolver } from "@hookform/resolvers/yup";
+
+import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { taskSchema, } from "@/types/TaskSchema";
+import type { Task, TaskFormData } from "@/types/taskTypes";
 
 const EditTask = () => {
   const navigate = useNavigate();
-  // State for form data
-  const [formData, setFormData] = useState({
-    title: "Complete project documentation",
-    description:
-      "Finish writing the technical documentation for the project including API endpoints, database schema, and deployment instructions.",
-    dueDate: "2023-05-20",
-    priority: "High",
-    status: "In Progress",
-    tags: ["Work", "Urgent", "Important"],
+  const { id } = useParams<{ id: string }>();
+  const { data, isLoading } = useGetSingleTaskQuery(id as string);
+  const [updateTask, { isLoading: isUpdating }] = useUpdateTaskMutation();
+  const [deleteTask, { isLoading: isDeleting }] = useDeleteTaskMutation();
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    setValue,
+  } = useForm<TaskFormData>({
+    resolver: yupResolver(taskSchema) as any,
+    defaultValues: {
+      title: "",
+      description: "",
+      dueDate: "",
+      priority: "Medium",
+      status: "To Do",
+    },
   });
 
-  // Available tags
-  const availableTags = ["Work", "Personal", "Urgent", "Important"];
+  useEffect(() => {
+    if (data && data?.data) {
+      const task: Task = data?.data;
 
-  // Handle form input changes
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  // Handle checkbox changes for tags
-  const handleTagChange = (tag: string) => {
-    setFormData((prev) => {
-      if (prev.tags.includes(tag)) {
-        return { ...prev, tags: prev.tags.filter((t) => t !== tag) };
-      } else {
-        return { ...prev, tags: [...prev.tags, tag] };
+      setValue("title", task.title);
+      setValue("description", task.description);
+      if (task.dueDate) {
+        const formattedDate = new Date(task.dueDate)
+          .toISOString()
+          .split("T")[0];
+        setValue("dueDate", formattedDate);
       }
-    });
-  };
+      setValue("priority", task.priority);
+      setValue("status", task.status);
+      setTaskToDelete(task._id);
+    }
+  }, [data, setValue]);
 
-  // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Here you would implement the API call to update the task
-    console.log("Updated task:", formData);
-    alert("Task updated successfully!");
-    navigate("/");
-  };
-
-  // Handle task deletion
-  const handleDelete = () => {
-    if (confirm("Are you sure you want to delete this task?")) {
-      // Here you would implement the API call to delete the task
-      console.log("Deleted task");
-      alert("Task deleted successfully!");
-      navigate("/");
+  const onSubmit = async (formData: TaskFormData) => {
+    try {
+      await updateTask({
+        id,
+        ...formData,
+      }).unwrap();
+      toast.success("Task Updated Succesfully");
+      navigate("/dashboard");
+    } catch (error: any) {
+      toast.error(error?.data?.message || error?.message);
     }
   };
 
+  const confirmDelete = async () => {
+    if (taskToDelete) {
+      try {
+        await deleteTask(taskToDelete).unwrap();
+        toast.success("Task deleted successfully");
+        navigate("/dashboard");
+      } catch (error: any) {
+        toast.error("Failed to delete task");
+      } finally {
+        setShowDeleteModal(false);
+        setTaskToDelete(null);
+      }
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <Container
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: "80vh" }}
+      >
+        <div className="text-center">
+          <Spinner animation="border" variant="primary" />
+          <p className="mt-2">Loading task details...</p>
+        </div>
+      </Container>
+    );
+  }
+
   return (
-    <Container fluid className="p-4 bg-light h-100">
+    <Container fluid className="p-4">
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Delete</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete this task? This action cannot be
+          undone.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+            Cancel
+          </Button>
+          <Button
+            variant="danger"
+            onClick={confirmDelete}
+            disabled={isDeleting}
+          >
+            {isDeleting ? "Deleting..." : "Delete Task"}
+          </Button>
+        </Modal.Footer>
+      </Modal>
       <Card className="shadow-sm border-0">
         <Card.Body className="p-4">
-          <h2 className="mb-2">Edit Task</h2>
+          <h2 className="mb-3">Edit Task</h2>
           <p className="text-muted mb-4">Update your task details</p>
 
-          <Form onSubmit={handleSubmit}>
-            <Row>
-              <Col md={12} className="mb-3">
-                <Form.Group controlId="taskTitle">
-                  <Form.Label>Task Title</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="title"
-                    value={formData.title}
-                    onChange={handleChange}
-                    className="shadow-sm"
-                    required
-                  />
-                </Form.Group>
-              </Col>
+          <Form onSubmit={handleSubmit(onSubmit)}>
+            <Form.Group className="mb-3">
+              <Form.Label>Task Title</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter task title"
+                isInvalid={!!errors.title}
+                {...register("title")}
+              />
+              {errors.title && (
+                <Form.Control.Feedback type="invalid">
+                  {errors.title.message}
+                </Form.Control.Feedback>
+              )}
+            </Form.Group>
 
-              <Col md={12} className="mb-3">
-                <Form.Group controlId="taskDescription">
-                  <Form.Label>Description</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    rows={5}
-                    name="description"
-                    value={formData.description}
-                    onChange={handleChange}
-                    className="shadow-sm"
-                  />
-                </Form.Group>
-              </Col>
+            <Form.Group className="mb-3">
+              <Form.Label>Description</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={4}
+                placeholder="Enter task description"
+                isInvalid={!!errors.description}
+                {...register("description")}
+              />
+              {errors.description && (
+                <Form.Control.Feedback type="invalid">
+                  {errors.description.message}
+                </Form.Control.Feedback>
+              )}
+            </Form.Group>
 
-              <Col md={6} className="mb-3">
-                <Form.Group controlId="dueDate">
+            <Row className="mb-3">
+              <Col md={6}>
+                <Form.Group>
                   <Form.Label>Due Date</Form.Label>
                   <Form.Control
                     type="date"
-                    name="dueDate"
-                    value={formData.dueDate}
-                    onChange={handleChange}
-                    className="shadow-sm"
+                    isInvalid={!!errors.dueDate}
+                    {...register("dueDate")}
                   />
+                  {errors.dueDate && (
+                    <Form.Control.Feedback type="invalid">
+                      {errors.dueDate.message}
+                    </Form.Control.Feedback>
+                  )}
                 </Form.Group>
               </Col>
-
-              <Col md={6} className="mb-3">
-                <Form.Group controlId="priority">
+              <Col md={6}>
+                <Form.Group>
                   <Form.Label>Priority</Form.Label>
                   <Form.Select
-                    name="priority"
-                    value={formData.priority}
-                    onChange={handleChange}
-                    className="shadow-sm"
+                    isInvalid={!!errors.priority}
+                    {...register("priority")}
                   >
                     <option value="High">High</option>
                     <option value="Medium">Medium</option>
                     <option value="Low">Low</option>
                   </Form.Select>
+                  {errors.priority && (
+                    <Form.Control.Feedback type="invalid">
+                      {errors.priority.message}
+                    </Form.Control.Feedback>
+                  )}
                 </Form.Group>
-              </Col>
-
-              <Col md={12} className="mb-3">
-                <Form.Group controlId="status">
-                  <Form.Label>Status</Form.Label>
-                  <Form.Select
-                    name="status"
-                    value={formData.status}
-                    onChange={handleChange}
-                    className="shadow-sm"
-                  >
-                    <option value="To Do">To Do</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Completed">Completed</option>
-                  </Form.Select>
-                </Form.Group>
-              </Col>
-
-              <Col md={12} className="mb-4">
-                <Form.Label>Tags</Form.Label>
-                <div className="d-flex flex-wrap gap-3">
-                  {availableTags.map((tag) => (
-                    <Form.Check
-                      key={tag}
-                      type="checkbox"
-                      id={`tag-${tag}`}
-                      label={tag}
-                      checked={formData.tags.includes(tag)}
-                      onChange={() => handleTagChange(tag)}
-                      className="user-select-none"
-                    />
-                  ))}
-                </div>
-              </Col>
-
-              <Col xs={12} className="d-flex justify-content-between">
-                <Button
-                  variant="danger"
-                  type="button"
-                  onClick={handleDelete}
-                  className="d-flex align-items-center"
-                >
-                  <i className="bi bi-trash me-2"></i> Delete Task
-                </Button>
-
-                <div>
-                  <Button
-                    variant="secondary"
-                    type="button"
-                    onClick={() => navigate("/")}
-                    className="me-2"
-                  >
-                    Cancel
-                  </Button>
-                  <Button variant="primary" type="submit">
-                    Update Task
-                  </Button>
-                </div>
               </Col>
             </Row>
+
+            <Form.Group className="mb-4">
+              <Form.Label>Status</Form.Label>
+              <Form.Select isInvalid={!!errors.status} {...register("status")}>
+                <option value="To Do">To Do</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+              </Form.Select>
+              {errors.status && (
+                <Form.Control.Feedback type="invalid">
+                  {errors.status.message}
+                </Form.Control.Feedback>
+              )}
+            </Form.Group>
+
+            <div className="d-flex justify-content-between">
+              <Button
+                variant="outline-danger"
+                onClick={() => setShowDeleteModal(true)}
+                disabled={isDeleting}
+              >
+                {isDeleting ? "Deleting..." : "Delete Task"}
+              </Button>
+
+              <div>
+                <Button
+                  variant="light"
+                  className="me-2"
+                  onClick={() => navigate("/dashboard")}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="primary"
+                  type="submit"
+                  disabled={isSubmitting || isUpdating}
+                >
+                  {isSubmitting || isUpdating ? "Saving..." : "Save Changes"}
+                </Button>
+              </div>
+            </div>
           </Form>
         </Card.Body>
       </Card>

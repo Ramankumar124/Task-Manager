@@ -8,12 +8,12 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { setUserData } from "@/redux/features/authSlice";
 import { IoPerson } from "react-icons/io5";
 import toast from "react-hot-toast";
-import { registerSchema } from "@/schemas/authSchema";
+import { registerSchema } from "@/types/authSchema";
 import { userSignup } from "@/Service/apiService";
 interface RegisterFormInput {
   email: string;
   password: string;
-  userName:string;
+  userName: string;
 }
 
 type RegisterRes = {

@@ -31,9 +31,8 @@ function App() {
           <Route index element={<Dashboard />} />
           <Route path="dashboard" element={<Navigate to="/" replace />} />
           <Route path="add-task" element={<AddTask />} />
-          <Route path="edit-task" element={<EditTask />} />
+          <Route path="edit-task/:id" element={<EditTask />} />
           <Route path="profile" element={<Profile />} />
-    
         </Route>
 
         {/* Catch-all route */}

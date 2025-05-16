@@ -13,7 +13,7 @@ const router = Router();
 router.route("/").post(validateYup(TaskSchema), createTask);
 router.route("/").get(getAllTasks);
 router.route("/:id").get(getTaskById);
-router.route("/:id").put(validateYup(TaskSchema), updateTask);
+router.route("/:id").put( updateTask);
 router.route("/:id").delete(deleteTask);
 
 export { router as taskRoutes };
