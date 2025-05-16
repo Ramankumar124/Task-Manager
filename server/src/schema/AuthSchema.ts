@@ -35,3 +35,7 @@ export const changePasswordSchema = yup.object({
     .required("Password is required..")
     .min(6, "Password must be atleast 6 characters long"),
 });
+
+export const updateProfileSchema = yup.object().shape({
+  userName: yup.string().required("Username is required"),
+});

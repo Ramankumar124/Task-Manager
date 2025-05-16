@@ -9,21 +9,21 @@ import { deleteFromCloudinary, uploadToCloudinary } from "../utils/cloudnary";
 import logger from "../utils/logger";
 
 interface UserDataRequest extends Request {
-  user?: { email: string; _id?: string };
+  user?: { email: string;id?: string };
 }
 
 const accessTokenOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production", 
-  sameSite: "lax" as const, 
-  maxAge:60 * 60 * 1000, 
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  maxAge: 60 * 60 * 1000,
 };
 
 const refreshTokenOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production", 
-  sameSite: "lax" as const, 
-  maxAge: 7 * 24 * 60 * 60 * 1000, 
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 
 const genrerateAccessAndRefreshToken = async (userId: string) => {
@@ -185,8 +185,7 @@ const loginUser = asyncHandler(async function (
 const logoutUser = asyncHandler(
   async (req: UserDataRequest, res: Response, next: NextFunction) => {
     await User.findByIdAndUpdate(
-     
-      req.user?._id,
+      req.user?.id,
       {
         $unset: {
           refreshToken: 1,
@@ -210,12 +209,11 @@ const logoutUser = asyncHandler(
   }
 );
 
-
 const updateAvatar = asyncHandler(
   async (req: UserDataRequest, res: Response, next: NextFunction) => {
-    
-    const user = await User.findById(req.user?._id);
-
+    const user = await User.findById(req.user?.id);
+;
+ 
     if (!user) {
       return next(new ApiError(404, "user not found"));
     }
@@ -223,8 +221,7 @@ const updateAvatar = asyncHandler(
       await deleteFromCloudinary(user?.avatar.public_id!);
     } else {
       await User.findByIdAndUpdate(
-       
-        req.user?._id,
+        req.user?.id,
         {
           avatar: {
             url: "",
@@ -247,10 +244,9 @@ const updateAvatar = asyncHandler(
     if (!uploadAvatar) {
       return next(new ApiError(400, "avatar upload failed"));
     }
-
+ await deleteFromCloudinary(user?.avatar.public_id!);
     const updatedUser = await User.findByIdAndUpdate(
-      
-      req.user?._id,
+      req.user?.id,
       {
         avatar: {
           url: uploadAvatar?.url,
@@ -278,7 +274,7 @@ const userData = asyncHandler(
     const user = await User.findOne({
       email: (req.user as { email: string }).email,
     })
-      .select("-password -refreshToken") 
+      .select("-password -refreshToken")
       .populate("Tasks");
 
     if (!user) {
@@ -291,18 +287,59 @@ const userData = asyncHandler(
       .json(new ApiResponse(200, user, "User Data sended Succesfully"));
   }
 );
+const updateProfile = asyncHandler(
+  async (req: UserDataRequest, res: Response, next: NextFunction) => {
+    const { userName, email } = req.body;
+
+
+    const user = await User.findById(req.user?.id);
+    if (!user) {
+      return next(new ApiError(404, "User not found"));
+    }
+
+    // Check if email is already in use by another user
+    if (email !== user.email) {
+      const existingUser = await User.findOne({
+        email,
+        _id: { $ne: req.user?.id },
+      });
+      if (existingUser) {
+        return next(new ApiError(400, "Email is already in use"));
+      }
+    }
+
+    // Update user data
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user?.id,
+      {
+        userName,
+        email,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    )
+      .select("-password -refreshToken")
+      .populate("Tasks");
+
+    if (!updatedUser) {
+      return next(new ApiError(400, "Failed to update profile"));
+    }
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, updatedUser, "Profile updated successfully"));
+  }
+);
 
 export {
   registerUser,
-  // verifyEmail,
-  // resendEmail,
+
   logoutUser,
   loginUser,
-  // forgotPassword,
-  // verifyForgotPasswordOtp,
   updateAvatar,
+  updateProfile,
   userData,
-  // AllUserList,
   refreshAccessToken,
-  // resetPassword,
 };

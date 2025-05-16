@@ -16,7 +16,7 @@ const uploadToCloudinary=async(filePath:string)=>{
         if(!filePath) return null;
 
         const response=await cloudinary.uploader.upload(filePath,{
-            folder:"waveChat",
+            folder:"TaskManager",
             resource_type:"auto"
         })
         fs.unlinkSync(filePath);

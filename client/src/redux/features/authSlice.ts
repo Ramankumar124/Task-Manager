@@ -1,7 +1,6 @@
 import { getUserData } from "@/Service/apiService";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import axios from "axios";
 
 export interface User {
   _id: string;
@@ -30,8 +29,8 @@ export const fetchUserData = createAsyncThunk<User, void>(
   "auth/fetchUserData",
   async () => {
      const response = (await getUserData()) as { data: User };
-    
-    return response?.data
+    //@ts-ignore
+    return response?.data?.data
   }
 );
 

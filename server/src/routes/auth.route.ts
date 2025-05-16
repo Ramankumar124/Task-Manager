@@ -6,12 +6,16 @@ import {
   updateAvatar,
   userData,
   refreshAccessToken,
-
+  updateProfile,
 } from "../controller/auth.Controller";
 import { upload } from "../middlewares/multer.middleware";
 import { jwtVerify } from "../middlewares/verify.middleware";
 import validateYup from "../middlewares/validateYup.middleware";
-import { registerSchema, signinSchema } from "../schema/AuthSchema";
+import {
+  registerSchema,
+  signinSchema,
+  updateProfileSchema,
+} from "../schema/AuthSchema";
 
 const router = Router();
 router
@@ -21,14 +25,10 @@ router
     validateYup(registerSchema),
     registerUser
   );
-router.route("/login").post(validateYup(signinSchema),loginUser);
+router.route("/login").post(validateYup(signinSchema), loginUser);
 router.route("/refresh-token").post(refreshAccessToken);
-// router.route("/forgotPassword").post(forgotPassword);
-// router.route("/resetPassword").post(resetPassword);
-// router.route("/verifyForgotPasswordOtp").post(verifyForgotPasswordOtp);
 router.route("/logout").post(jwtVerify, logoutUser);
 router.route("/getUserData").get(jwtVerify, userData);
-// router.route("/get-all-users").get(jwtVerify, AllUserList);
 router
   .route("/updateAvatar")
   .post(
@@ -36,6 +36,9 @@ router
     jwtVerify,
     updateAvatar
   );
-// router.post('/googleLogin',googleLogin)
+router
+  .route("/updateProfile")
+  .put(jwtVerify, validateYup(updateProfileSchema), updateProfile);
+
 
 export { router as authRoutes };

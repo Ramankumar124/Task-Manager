@@ -7,7 +7,7 @@ interface loginReq {
 interface signreq {
   email: string;
   password: string;
-  userName: string,
+  userName: string;
 }
 
 export function userLogin(data: loginReq) {
@@ -17,8 +17,12 @@ export function userLogin(data: loginReq) {
 export function userSignup(data: signreq) {
   return http.post(`/api/auth/register`, data);
 }
-export function getUserData(){
+
+export function getUserData() {
   return http.get("/api/auth/getUserData");
 }
 
+export function logoutUser() {
+  return http.post("/api/auth/logout");
+}
 
