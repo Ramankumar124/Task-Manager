@@ -10,10 +10,6 @@ interface signreq {
   userName: string,
 }
 
-
-
-
-
 export function userLogin(data: loginReq) {
   return http.post(`/api/auth/login`, data);
 }

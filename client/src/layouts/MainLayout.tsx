@@ -1,8 +1,9 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "@/components/Sidebar";
 import { Row, Col } from "react-bootstrap";
+import type React from "react";
 
-const MainLayout = () => {
+const MainLayout:React.FC = () => {
   return (
     <div className="d-flex flex-column vh-100">
       <Row className="g-0 flex-grow-1 overflow-hidden">

@@ -9,10 +9,10 @@ import "./App.css";
 
 import MainLayout from "./layouts/MainLayout";
 
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./pages/dashboard/Dashboard";
 import AddTask from "./pages/task/AddTask";
 import EditTask from "./pages/task/EditTask";
-import Profile from "./pages/Profile";
+import Profile from "./pages/profile/Profile";
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
 

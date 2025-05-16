@@ -2,9 +2,6 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 
-type Priority = "High" | "Medium" | "Low";
-type Status = "To Do" | "In Progress" | "Completed";
-
 export interface User {
   _id: string;
   userName: string;

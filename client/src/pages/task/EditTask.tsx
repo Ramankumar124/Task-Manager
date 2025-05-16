@@ -6,7 +6,6 @@ import {
   Button,
   Card,
   Spinner,
-  Modal,
 } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import {
@@ -19,8 +18,9 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { taskSchema, } from "@/types/TaskSchema";
+import { taskSchema } from "@/types/TaskSchema";
 import type { Task, TaskFormData } from "@/types/taskTypes";
+import DeleteTaskCard from "../dashboard/DeleteTaskCard";
 
 const EditTask = () => {
   const navigate = useNavigate();
@@ -109,27 +109,12 @@ const EditTask = () => {
 
   return (
     <Container fluid className="p-4">
-      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Confirm Delete</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          Are you sure you want to delete this task? This action cannot be
-          undone.
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-            Cancel
-          </Button>
-          <Button
-            variant="danger"
-            onClick={confirmDelete}
-            disabled={isDeleting}
-          >
-            {isDeleting ? "Deleting..." : "Delete Task"}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <DeleteTaskCard
+        setShowDeleteModal={setShowDeleteModal}
+        isDeleting={isDeleting}
+        showDeleteModal={showDeleteModal}
+        confirmDelete={confirmDelete}
+      />
       <Card className="shadow-sm border-0">
         <Card.Body className="p-4">
           <h2 className="mb-3">Edit Task</h2>
