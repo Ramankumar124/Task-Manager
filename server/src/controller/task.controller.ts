@@ -6,7 +6,9 @@ import User from "../models/user.model";
 import { ApiError } from "../utils/ApiError";
 import { ApiResponse } from "../utils/ApiResponse";
 import redisClient from "../utils/redisClient"; // Added import for redisClient
-
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { enhanceTaskByAi } from "../utils/aiAgent";
+import { systemPrompt } from "../constants/systemPrompt";
 const createTask = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { title, description, dueDate, priority, status } = req.body;
@@ -51,7 +53,6 @@ const getAllTasks = asyncHandler(
       return next(new ApiError(401, "User not authenticated"));
     }
 
-    
     const cachedTasks = await redisClient.get(cacheKey);
     if (cachedTasks) {
       return res
@@ -71,7 +72,6 @@ const getAllTasks = asyncHandler(
       return next(new ApiError(404, "User not found"));
     }
     const tasks = user.Tasks;
-
 
     await redisClient.set(cacheKey, JSON.stringify(tasks), "EX", 3600);
 
@@ -182,4 +182,24 @@ const deleteTask = asyncHandler(
   }
 );
 
-export { createTask, getAllTasks, getTaskById, updateTask, deleteTask };
+const enhanceTask = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+   
+    const {title,description}=req.body;
+    console.log('====================================');
+    console.log(req.body);
+    console.log('====================================');
+    // Validate input
+  
+    const requestData = JSON.stringify({
+      title,
+      description
+    });
+   const enhancedData= await enhanceTaskByAi(requestData,systemPrompt);
+    return res
+      .status(200)
+      .json(new ApiResponse(200, enhancedData, "data enhanced  successfully"));
+
+  }
+);
+export { createTask, getAllTasks, getTaskById, updateTask, deleteTask ,enhanceTask};

@@ -7,11 +7,12 @@ import {
   Card,
   Spinner,
 } from "react-bootstrap";
-import { useForm } from "react-hook-form";
+import { useForm } from "react-hook-form"; // Removed watch from here, it will be destructured below
 import {
   useUpdateTaskMutation,
   useDeleteTaskMutation,
   useGetSingleTaskQuery,
+  useEnhanceTaskMutation,
 } from "@/redux/api/tasksApi";
 import { yupResolver } from "@hookform/resolvers/yup";
 
@@ -28,6 +29,11 @@ const EditTask = () => {
   const { data, isLoading } = useGetSingleTaskQuery(id as string);
   const [updateTask, { isLoading: isUpdating }] = useUpdateTaskMutation();
   const [deleteTask, { isLoading: isDeleting }] = useDeleteTaskMutation();
+  const [enhanceTask, { isLoading: IsEnhancing }] = useEnhanceTaskMutation();
+  const [enhanceTaskData, setEnhanceTaskData] = useState({
+    title: "",
+    description: "",
+  });
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
@@ -36,6 +42,7 @@ const EditTask = () => {
     handleSubmit,
     formState: { errors, isSubmitting },
     setValue,
+    watch, // Destructure watch from useForm
   } = useForm<TaskFormData>({
     resolver: yupResolver(taskSchema) as any,
     defaultValues: {
@@ -47,9 +54,13 @@ const EditTask = () => {
     },
   });
 
+  // Watch for changes in title and description fields
+  const watchedTitle = watch("title");
+  const watchedDescription = watch("description");
+
   useEffect(() => {
-    if (data && data?.data) {
-      const task: Task = data?.data;
+    if (data?.data) {
+      const task: Task = data.data;
 
       setValue("title", task.title);
       setValue("description", task.description);
@@ -62,13 +73,22 @@ const EditTask = () => {
       setValue("priority", task.priority);
       setValue("status", task.status);
       setTaskToDelete(task._id);
+      setEnhanceTaskData({ title: task.title, description: task.description });
     }
-  }, [data, setValue]);
+  }, [data, setValue, setEnhanceTaskData]);
+
+  // Update enhanceTaskData when title or description changes
+  useEffect(() => {
+    setEnhanceTaskData({
+      title: watchedTitle,
+      description: watchedDescription,
+    });
+  }, [watchedTitle, watchedDescription, setEnhanceTaskData]);
 
   const onSubmit = async (formData: TaskFormData) => {
     try {
       await updateTask({
-        id,
+        id: id as string,
         ...formData,
       }).unwrap();
       toast.success("Task Updated Succesfully");
@@ -90,6 +110,30 @@ const EditTask = () => {
         setShowDeleteModal(false);
         setTaskToDelete(null);
       }
+    }
+  };
+  const handleEnhanceWithAi = async () => {
+    console.log("Enhance task data:", enhanceTaskData);
+    try {
+      const rawData = await enhanceTask(enhanceTaskData).unwrap();
+
+      if (rawData?.data) {
+        const cleanedResponse = JSON.parse(
+          rawData.data.replace(/```json|```/g, "").trim()
+        );
+        if (cleanedResponse.title) {
+          setValue("title", cleanedResponse.title);
+        }
+        if (cleanedResponse.description) {
+          setValue("description", cleanedResponse.description);
+        }
+        toast.success("Task enhanced with AI!");
+      } else {
+        toast.error("Failed to get enhancement data from AI response.");
+      }
+    } catch (error: unknown) {
+      console.error("Error enhancing task with AI:", error);
+      toast.error("Failed to enhance task with AI.");
     }
   };
 
@@ -116,7 +160,23 @@ const EditTask = () => {
         confirmDelete={confirmDelete}
       />
       <Card className="shadow-sm border-0">
-        <Card.Body className="p-4">
+        <Card.Body className="p-4" style={{ position: "relative" }}>
+          <div
+            style={{
+              position: "absolute",
+              top: "1.5rem",
+              right: "1.5rem",
+              zIndex: 10,
+            }}
+          >
+ 
+            <Button
+              className="bg-gradient-to-r from-purple-700 to-blue-500 text-white border-0 py-2 px-4 rounded"
+              onClick={handleEnhanceWithAi} // Corrected onClick handler
+            >
+              {IsEnhancing ? "Enhancing...." : " Enhance with AI"}
+            </Button>
+          </div>
           <h2 className="mb-3">Edit Task</h2>
           <p className="text-muted mb-4">Update your task details</p>
 

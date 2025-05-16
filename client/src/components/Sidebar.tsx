@@ -1,8 +1,10 @@
 import { NavLink } from 'react-router-dom';
 import { Nav } from 'react-bootstrap';
-import { FC } from 'react';
+import type { RootState } from '@/redux/Store';
+import { useSelector } from 'react-redux';
 
-const Sidebar: FC = () => {
+const Sidebar:React.FC = () => {
+  const user=useSelector((state:RootState)=>state.auth.user);
   return (
     <div className="sidebar-wrapper py-3">
       <div className="sidebar-header px-3 mb-4">
@@ -52,11 +54,11 @@ const Sidebar: FC = () => {
       <div className="sidebar-footer mt-auto px-3 py-3">
         <div className="user-info d-flex align-items-center">
           <div className="user-avatar bg-primary text-white d-flex align-items-center justify-content-center rounded-circle">
-            JD
+            <img className='w-full h-full rounded-full' src={user?.avatar?.url} alt="" />
           </div>
           <div className="ms-2">
-            <p className="mb-0 fw-medium">John Doe</p>
-            <small className="text-muted">john@example.com</small>
+            <p className="mb-0 fw-medium">{user?.userName}</p>
+            <small className="text-muted">{user?.email}</small>
           </div>
         </div>
       </div>
