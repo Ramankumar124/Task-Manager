@@ -5,6 +5,7 @@ import Task from "../models/task.model";
 import User from "../models/user.model";
 import { ApiError } from "../utils/ApiError";
 import { ApiResponse } from "../utils/ApiResponse";
+import redisClient from "../utils/redisClient"; // Added import for redisClient
 
 const createTask = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -32,6 +33,8 @@ const createTask = asyncHandler(
 
     await User.findByIdAndUpdate(userId, { $push: { Tasks: newTask._id } });
 
+    await redisClient.del(`tasks:${userId}`);
+
     return res
       .status(201)
       .json(new ApiResponse(201, newTask, "Task Created Successfully"));
@@ -42,9 +45,24 @@ const getAllTasks = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     //@ts-ignore
     const userId = req?.user?.id!;
+    const cacheKey = `tasks:${userId}`;
 
     if (!userId) {
       return next(new ApiError(401, "User not authenticated"));
+    }
+
+    
+    const cachedTasks = await redisClient.get(cacheKey);
+    if (cachedTasks) {
+      return res
+        .status(200)
+        .json(
+          new ApiResponse(
+            200,
+            JSON.parse(cachedTasks),
+            "Tasks fetched successfully from cache"
+          )
+        );
     }
 
     const user = await User.findById(userId).populate("Tasks");
@@ -53,6 +71,10 @@ const getAllTasks = asyncHandler(
       return next(new ApiError(404, "User not found"));
     }
     const tasks = user.Tasks;
+
+
+    await redisClient.set(cacheKey, JSON.stringify(tasks), "EX", 3600);
+
     return res
       .status(200)
       .json(new ApiResponse(200, tasks, "Tasks fetched successfully"));
@@ -89,7 +111,7 @@ const getTaskById = asyncHandler(
 const updateTask = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     console.log(req.body);
-    
+
     const { id } = req.params;
     const { title, description, dueDate, priority, status } = req.body;
     // @ts-ignore
@@ -118,6 +140,8 @@ const updateTask = asyncHandler(
     if (!task) {
       return next(new ApiError(404, "Task not found"));
     }
+
+    await redisClient.del(`tasks:${userId}`);
 
     return res
       .status(200)
@@ -149,6 +173,8 @@ const deleteTask = asyncHandler(
     await User.findByIdAndUpdate(userId, {
       $pull: { Tasks: new Types.ObjectId(id) },
     });
+
+    await redisClient.del(`tasks:${userId}`);
 
     return res
       .status(200)

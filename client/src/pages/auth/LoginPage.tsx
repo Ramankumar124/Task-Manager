@@ -8,7 +8,6 @@ import { loginSchema } from "@/types/authSchema";
 import { userLogin } from "@/Service/apiService";
 import { setUserData } from "@/redux/features/authSlice";
 import toast from "react-hot-toast";
-import type { TaskData } from "@/types/taskTypes";
 interface LoginFormInputs {
   email: string;
   password: string;
