@@ -22,7 +22,6 @@ type loginRes = {
     _id: string;
     userName: string;
     email: string;
-    Tasks: TaskData[];
     avatar: {
       public_id: string;
       url: string;

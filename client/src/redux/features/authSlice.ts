@@ -1,3 +1,4 @@
+import { getUserData } from "@/Service/apiService";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
@@ -25,14 +26,12 @@ const initialState: AuthSliceState = {
   user: null,
 };
 
-export const fetchUserData = createAsyncThunk(
+export const fetchUserData = createAsyncThunk<User, void>(
   "auth/fetchUserData",
   async () => {
-    const response = await axios.get(`/auth/getUserData`, {
-      withCredentials: true,
-      timeout: 3000,
-    });
-    return response.data.data;
+     const response = (await getUserData()) as { data: User };
+    
+    return response?.data
   }
 );
 

@@ -16,7 +16,7 @@ Api.interceptors.response.use(
     const originalRequest = error.config as AxiosRequestConfig & {
       _retry?: boolean;
     };
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && error.response.statusText=="ACCESS_TOKEN_IS_MISSING" && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
         await axios.post(
@@ -26,7 +26,6 @@ Api.interceptors.response.use(
         );
         return Api(originalRequest);
       } catch (refreshError) {
-        // Use window.location instead of useNavigate
         window.location.href = "/login";
         return Promise.reject(refreshError);
       }

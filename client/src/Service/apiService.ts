@@ -17,6 +17,8 @@ export function userLogin(data: loginReq) {
 export function userSignup(data: signreq) {
   return http.post(`/api/auth/register`, data);
 }
-
+export function getUserData(){
+  return http.get("/api/auth/getUserData");
+}
 
 

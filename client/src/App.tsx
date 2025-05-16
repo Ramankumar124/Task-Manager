@@ -15,27 +15,45 @@ import EditTask from "./pages/task/EditTask";
 import Profile from "./pages/profile/Profile";
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "./redux/Store";
+import { useEffect } from "react";
+import { fetchUserData } from "./redux/features/authSlice";
+import ProtectedRoute from "./protectedRoute/protectedRoute";
 
+// Create a hook that uses AppDispatch type
+const useAppDispatch = () => useDispatch<AppDispatch>();
 
 function App() {
+  const { user } = useSelector((state: RootState) => state?.auth);
+
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(fetchUserData());
+  }, [dispatch]);
+
   return (
     <Router>
       <Routes>
-          <Route>
+    
+          
+        <Route element={<ProtectedRoute user={!user} redirect="/dashboard"/>}>
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
         </Route>
 
         {/* Protected routes with sidebar */}
-        <Route path="/" element={<MainLayout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="dashboard" element={<Navigate to="/" replace />} />
-          <Route path="add-task" element={<AddTask />} />
-          <Route path="edit-task/:id" element={<EditTask />} />
-          <Route path="profile" element={<Profile />} />
+        <Route element={<ProtectedRoute user={user} />}>
+          <Route path="/" element={<MainLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="dashboard" element={<Navigate to="/" replace />} />
+            <Route path="add-task" element={<AddTask />} />
+            <Route path="edit-task/:id" element={<EditTask />} />
+            <Route path="profile" element={<Profile />} />
+          </Route>
         </Route>
 
-        {/* Catch-all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
