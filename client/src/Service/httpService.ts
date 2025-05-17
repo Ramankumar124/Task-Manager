@@ -16,7 +16,9 @@ Api.interceptors.response.use(
     const originalRequest = error.config as AxiosRequestConfig & {
       _retry?: boolean;
     };
-    if (error.response?.status === 401 && error.response.statusText=="ACCESS_TOKEN_IS_MISSING" && !originalRequest._retry) {
+    console.log(error);
+    //@ts-ignore
+    if (error.response?.status === 401 && error?.response?.data?.message =="ACCESS_TOKEN_IS_MISSING" && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
         await axios.post(

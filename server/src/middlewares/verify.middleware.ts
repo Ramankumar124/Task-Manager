@@ -16,9 +16,8 @@ export async function jwtVerify(
     const token = await req?.cookies?.accessToken;
 
     if (!token) {
-      res.statusMessage = "ACCESS_TOKEN_IS_MISSING";
 
-      return next(new ApiError(401, "Authentication token is missing"));
+      return next(new ApiError(401, "ACCESS_TOKEN_IS_MISSING"));
     }
     let decodedToken = jwt.verify(
       token,
