@@ -16,14 +16,14 @@ interface UserDataRequest extends Request {
 
 const accessTokenOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
+  secure:true,
   sameSite: "none" as const,
   maxAge: 60 * 60 * 1000,
 };
 
 const refreshTokenOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
+  secure:true,
   sameSite: "none" as const,
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };
