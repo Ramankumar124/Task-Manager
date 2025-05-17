@@ -138,15 +138,17 @@ const Dashboard = () => {
         <>
           <div className="d-flex justify-content-between align-items-center mb-4">
             <div>
-              <h1 className="mb-1">My Tasks</h1>
-              <p className="text-muted mb-0">Manage your tasks efficiently</p>
+                <div className="dashboard-header">
+                  <h3 className="text-md! md:text-4xl!">My Tasks</h3>
+                  <p className="text-muted mb-0 text-sm! md:text-lg!">Manage your tasks efficiently</p>
+                </div>
             </div>
             <Button
               variant="primary"
-              className="d-flex align-items-center rounded-pill"
+              className="d-flex align-items-center rounded-pill text-sm!"
               onClick={() => navigate("/add-task")}
             >
-              <i className="bi bi-plus-lg me-1"></i> Add New Task
+              <i className="bi bi-plus-lg me-1 text-xs!"></i> Add New Task
             </Button>
           </div>
 

@@ -76,6 +76,28 @@ const RegisterPage = () => {
               </p>
             </div>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                            <button
+                type="button"
+                onClick={() =>
+                  (window.location.href = `${
+                    import.meta.env.VITE_API_URL || "http://localhost:5000"
+                  }/api/auth/google`)
+                }
+                className="w-full bg-white text-gray-800 border border-gray-300  px-4 py-2  rounded-lg! hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
+              >
+                <img
+                  src="/googleIcon.png"
+                  alt="Google"
+                  className="h-6 w-8 mr-2"
+                />
+                Continue with Google
+              </button>
+              
+              <div className="relative flex py-2 items-center">
+                <div className="flex-grow border-t border-gray-500"></div>
+                <span className="flex-shrink mx-4 text-gray-400">or</span>
+                <div className="flex-grow border-t border-gray-500"></div>
+              </div>
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-200">
                   Name
@@ -183,15 +205,14 @@ const RegisterPage = () => {
           />
           <div className="absolute inset-0 bg-purple-900/30  flex items-center justify-center">
             <div className="text-center p-8">
-              <h2 className="text-4xl font-bold text-white mb-4">
-                Welcome Back{" "}
-                <h1 className=" md:text-2xl font-bold flex items-center">
-                  <Zap className="mr-2 h-5 w-5 text-yellow-300" />
-                  <span className="">Circuit</span>
-                  <span className=" text-white">Builder</span>
-                  <span className=" ">AI</span>
+                     <div className="text-center p-8">
+              <h2 className="text-3xl! font-bold text-white mb-4 flex flex-col items-center gap-1.5 ">
+                Welcome Back To Task Sarthi
+                <h1 className="text-2xl!  font-bold flex items-center">
+                 Manage Task With Ai Power
                 </h1>
               </h2>
+            </div>
             </div>
           </div>
         </div>

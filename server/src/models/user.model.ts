@@ -10,6 +10,7 @@ interface IUser extends Document {
     url?: string;
     public_id?: string;
   };
+  googleId: string;
   Tasks: mongoose.Types.ObjectId[] | string[];
   refreshToken: string | null;
   comparePassword(password: string): Promise<boolean>;
@@ -42,13 +43,16 @@ const userSchema: Schema = new Schema<IUser>(
         public_id: String,
       },
     },
-    Tasks:[{
-      type:mongoose.Schema.ObjectId,
-      ref:"Task"
-    }],
+    Tasks: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "Task",
+      },
+    ],
     refreshToken: {
       type: String,
     },
+    googleId: String,
   },
 
   { timestamps: true }
@@ -67,7 +71,7 @@ userSchema.methods.comparePassword = async function (password: string) {
 userSchema.methods.createAccessToken = function () {
   //@ts-ignore
   return jwt.sign(
-    { id: this._id , name: this.name, email: this.email },
+    { id: this._id, name: this.name, email: this.email },
     process.env.ACCESS_TOKEN_SECRET as string,
     { expiresIn: process.env.ACCESS_TOKEN_EXPIRY! }
   );

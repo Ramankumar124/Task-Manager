@@ -1,9 +1,11 @@
-import { Request, Response, Express, urlencoded } from "express";
+import { Express, urlencoded } from "express";
 import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import passport from "./utils/passport";
+import session from "express-session";
 
 import { authRoutes } from "./routes/auth.route";
 import logger from "./utils/logger";
@@ -36,11 +38,24 @@ app.use(express.static("public"));
 app.use(express.json({ limit: "1mb" }));
 app.use(urlencoded({ extended: true, limit: "1mb" }));
 
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET as string,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 24 * 60 * 60 * 1000,
+    },
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+
 const ALLOWED_ORIGINS: string[] = [
   process.env.CLIENT_URL as string,
   "http://localhost:5173",
 ];
-
 app.use(
   cors({
     origin: ALLOWED_ORIGINS,
@@ -54,6 +69,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/tasks", jwtVerify, taskRoutes);
+
 app.use(errorHandler);
 
 export default app;

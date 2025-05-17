@@ -1,11 +1,11 @@
-import { Container, Row, Col} from "react-bootstrap"; 
+import { Container, Row, Col, Form, Button, Card } from "react-bootstrap";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate } from "react-router-dom";
 import {
   useAddTaskMutation,
   useEnhanceTaskMutation,
-} from "@/redux/api/tasksApi"; 
+} from "@/redux/api/tasksApi";
 import toast from "react-hot-toast";
 import { taskSchema } from "@/types/TaskSchema";
 import type { TaskFormData } from "@/types/taskTypes";
@@ -14,7 +14,7 @@ import { useState, useEffect } from "react";
 const AddTask = () => {
   const navigate = useNavigate();
   const [addTask] = useAddTaskMutation();
-  const [enhanceTask, { isLoading: IsEnhancing }] = useEnhanceTaskMutation(); 
+  const [enhanceTask, { isLoading: IsEnhancing }] = useEnhanceTaskMutation();
   const [enhanceTaskData, setEnhanceTaskData] = useState({
     title: "",
     description: "",
@@ -24,8 +24,8 @@ const AddTask = () => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    watch, 
-    setValue, 
+    watch,
+    setValue,
   } = useForm<TaskFormData>({
     resolver: yupResolver(taskSchema) as any,
     defaultValues: {
@@ -37,8 +37,8 @@ const AddTask = () => {
     },
   });
 
-  const watchedTitle = watch("title"); 
-  const watchedDescription = watch("description"); 
+  const watchedTitle = watch("title");
+  const watchedDescription = watch("description");
 
   useEffect(() => {
     setEnhanceTaskData({
@@ -48,7 +48,6 @@ const AddTask = () => {
   }, [watchedTitle, watchedDescription]);
 
   const handleEnhanceWithAi = async () => {
-    
     try {
       const rawData = await enhanceTask(enhanceTaskData).unwrap();
       if (rawData?.data) {
@@ -82,124 +81,126 @@ const AddTask = () => {
   };
 
   return (
-    <Container fluid className="p-4 h-100">
-      <div
-        className="bg-white rounded shadow-sm p-4"
-        style={{ position: "relative" }}
-      >
-        <div
-          className="absolute top-6 right-6 z-10"
-        >
-          <button
-            type="button"
-            onClick={handleEnhanceWithAi}
-            disabled={IsEnhancing || (!watchedTitle && !watchedDescription)}
-            className={`bg-gradient-to-r from-purple-700 to-blue-500 text-white py-2 px-4 rounded
-              ${(IsEnhancing || (!watchedTitle && !watchedDescription)) ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'}`}
+    <Container fluid className="p-4">
+      <h2 className=" text-md! md:text-lg">Add New Task</h2>
+      <p className="text-muted mb-4 text-sm! md:text-lg!">Create a new task to manage your work</p>
+      <Card className="shadow-2xl border-0">
+        <Card.Body className="p-4" style={{ position: "relative" }}>
+          <div
+            style={{
+              position: "absolute",
+              top: "1.5rem",
+              right: "1.5rem",
+              zIndex: 10,
+            }}
           >
-            {IsEnhancing ? "Enhancing...." : "Enhance with AI"}
-          </button>
-        </div>
-        <h2 className="mb-3">Add New Task</h2>
-        <p className="text-muted mb-4">Create a new task to manage your work</p>
-
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="mb-3">
-            <label htmlFor="taskTitle" className="">
-              Task Title
-            </label>
-            <input
-              type="text"
-              className="form-control shadow-sm"
-              id="taskTitle"
-              placeholder="Enter task title"
-              {...register("title")}
-            />
-            {errors.title && (
-              <div className="text-danger">{errors.title.message}</div>
-            )}
-          </div>
-
-          <div className="mb-3">
-            <label htmlFor="taskDescription" className="fw-medium">
-              Description
-            </label>
-            <textarea
-              className="form-control shadow-sm"
-              id="taskDescription"
-              rows={4}
-              placeholder="Enter task description"
-              {...register("description")}
-            />
-            {errors.description && (
-              <div className="text-danger">{errors.description.message}</div>
-            )}
-          </div>
-
-          <Row className="mb-3">
-            <Col md={6}>
-              <div className="mb-3">
-                <label htmlFor="dueDate">Due Date</label>
-                <input
-                  type="date"
-                  className="form-control"
-                  id="dueDate"
-                  {...register("dueDate")}
-                />
-                {errors.dueDate && (
-                  <div className="text-danger">{errors.dueDate.message}</div>
-                )}
-              </div>
-            </Col>
-            <Col md={6}>
-              <div className="mb-3">
-                <label htmlFor="priority">Priority</label>
-                <select
-                  id="priority"
-                  className="form-select"
-                  {...register("priority")}
-                >
-                  <option value="High">High</option>
-                  <option value="Medium">Medium</option>
-                  <option value="Low">Low</option>
-                </select>
-                {errors.priority && (
-                  <div className="text-danger">{errors.priority.message}</div>
-                )}
-              </div>
-            </Col>
-          </Row>
-
-          <div className="mb-3">
-            <label htmlFor="status">Status</label>
-            <select id="status" className="form-select" {...register("status")}>
-              <option value="To Do">To Do</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Completed">Completed</option>
-            </select>
-            {errors.status && (
-              <div className="text-danger">{errors.status.message}</div>
-            )}
-          </div>
-
-          <div className="d-flex justify-content-end">
-            <button
-              type="button"
-              className="btn btn-light me-2"
-              onClick={() => navigate("/dashboard")}
+            <Button
+              className="bg-gradient-to-r from-purple-700 to-blue-500 text-white border-0 py-2 md:px-4 rounded text-xs! md:text-lg!"
+              onClick={handleEnhanceWithAi}
+              disabled={IsEnhancing || (!watchedTitle && !watchedDescription)}
             >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Creating..." : "Create Task"}
-            </button>
+              {IsEnhancing ? "Enhancing...." : "Enhance with AI"}
+            </Button>
           </div>
-        </form>
-      </div>
+
+          <Form onSubmit={handleSubmit(onSubmit)}>
+            <Form.Group className="mb-3 mt-8">
+              <Form.Label className="text-sm! md:text-md!">Task Title</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter task title"
+                isInvalid={!!errors.title}
+                {...register("title")}
+              />
+              {errors.title && (
+                <Form.Control.Feedback type="invalid">
+                  {errors.title.message}
+                </Form.Control.Feedback>
+              )}
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Description</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={4}
+                placeholder="Enter task description"
+                isInvalid={!!errors.description}
+                {...register("description")}
+              />
+              {errors.description && (
+                <Form.Control.Feedback type="invalid">
+                  {errors.description.message}
+                </Form.Control.Feedback>
+              )}
+            </Form.Group>
+
+            <Row className="mb-3">
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Due Date</Form.Label>
+                  <Form.Control
+                    type="date"
+                    isInvalid={!!errors.dueDate}
+                    {...register("dueDate")}
+                  />
+                  {errors.dueDate && (
+                    <Form.Control.Feedback type="invalid">
+                      {errors.dueDate.message}
+                    </Form.Control.Feedback>
+                  )}
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Priority</Form.Label>
+                  <Form.Select
+                    isInvalid={!!errors.priority}
+                    {...register("priority")}
+                  >
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                  </Form.Select>
+                  {errors.priority && (
+                    <Form.Control.Feedback type="invalid">
+                      {errors.priority.message}
+                    </Form.Control.Feedback>
+                  )}
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <Form.Group className="mb-4">
+              <Form.Label>Status</Form.Label>
+              <Form.Select isInvalid={!!errors.status} {...register("status")}>
+                <option value="To Do">To Do</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+              </Form.Select>
+              {errors.status && (
+                <Form.Control.Feedback type="invalid">
+                  {errors.status.message}
+                </Form.Control.Feedback>
+              )}
+            </Form.Group>
+
+            <div className="d-flex justify-content-end">
+              <Button
+                variant="light"
+                className="me-2"
+                type="button"
+                onClick={() => navigate("/dashboard")}
+              >
+                Cancel
+              </Button>
+              <Button variant="primary" type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Creating..." : "Create Task"}
+              </Button>
+            </div>
+          </Form>
+        </Card.Body>
+      </Card>
     </Container>
   );
 };

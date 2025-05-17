@@ -42,7 +42,7 @@ const EditTask = () => {
     handleSubmit,
     formState: { errors, isSubmitting },
     setValue,
-    watch, // Destructure watch from useForm
+    watch,
   } = useForm<TaskFormData>({
     resolver: yupResolver(taskSchema) as any,
     defaultValues: {
@@ -54,7 +54,6 @@ const EditTask = () => {
     },
   });
 
-  // Watch for changes in title and description fields
   const watchedTitle = watch("title");
   const watchedDescription = watch("description");
 
@@ -77,7 +76,6 @@ const EditTask = () => {
     }
   }, [data, setValue, setEnhanceTaskData]);
 
-  // Update enhanceTaskData when title or description changes
   useEffect(() => {
     setEnhanceTaskData({
       title: watchedTitle,
@@ -121,12 +119,8 @@ const EditTask = () => {
         const cleanedResponse = JSON.parse(
           rawData.data.replace(/```json|```/g, "").trim()
         );
-        if (cleanedResponse.title) {
-          setValue("title", cleanedResponse.title);
-        }
-        if (cleanedResponse.description) {
-          setValue("description", cleanedResponse.description);
-        }
+        setValue("title", cleanedResponse?.title);
+        setValue("description", cleanedResponse.description);
         toast.success("Task enhanced with AI!");
       } else {
         toast.error("Failed to get enhancement data from AI response.");
@@ -153,14 +147,16 @@ const EditTask = () => {
 
   return (
     <Container fluid className="p-4">
+      <h2 className=" text-md! md:text-lg">Edit Task</h2>
+      <p className="text-muted mb-4 text-sm! md:text-lg">Update your task details</p>
       <DeleteTaskCard
         setShowDeleteModal={setShowDeleteModal}
         isDeleting={isDeleting}
         showDeleteModal={showDeleteModal}
         confirmDelete={confirmDelete}
       />
-      <Card className="shadow-sm border-0">
-        <Card.Body className="p-4" style={{ position: "relative" }}>
+      <Card className="shadow-2xl border-0">
+        <Card.Body className="p-4 " style={{ position: "relative" }}>
           <div
             style={{
               position: "absolute",
@@ -169,19 +165,16 @@ const EditTask = () => {
               zIndex: 10,
             }}
           >
- 
             <Button
-              className="bg-gradient-to-r from-purple-700 to-blue-500 text-white border-0 py-2 px-4 rounded"
+              className="bg-gradient-to-r from-purple-700 to-blue-500 text-white border-0 py-2 px-4 rounded text-xs! md:text-lg!"
               onClick={handleEnhanceWithAi} // Corrected onClick handler
             >
               {IsEnhancing ? "Enhancing...." : " Enhance with AI"}
             </Button>
           </div>
-          <h2 className="mb-3">Edit Task</h2>
-          <p className="text-muted mb-4">Update your task details</p>
 
           <Form onSubmit={handleSubmit(onSubmit)}>
-            <Form.Group className="mb-3">
+            <Form.Group className="mb-3 mt-8">
               <Form.Label>Task Title</Form.Label>
               <Form.Control
                 type="text"

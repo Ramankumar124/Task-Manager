@@ -49,6 +49,7 @@ const Profile = () => {
       setValue("userName", user.userName || "");
       setValue("email", user.email || "");
     }
+    
   }, [user, setValue]);
 
   const formatDate = (dateString?: string) => {

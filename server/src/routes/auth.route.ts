@@ -7,6 +7,7 @@ import {
   userData,
   refreshAccessToken,
   updateProfile,
+  googleCallback,
 } from "../controller/auth.Controller";
 import { upload } from "../middlewares/multer.middleware";
 import { jwtVerify } from "../middlewares/verify.middleware";
@@ -16,6 +17,7 @@ import {
   signinSchema,
   updateProfileSchema,
 } from "../schema/AuthSchema";
+import passport from "../utils/passport";
 
 const router = Router();
 router
@@ -40,5 +42,10 @@ router
   .route("/updateProfile")
   .put(jwtVerify, validateYup(updateProfileSchema), updateProfile);
 
+router
+  .route("/google")
+  .get(passport.authenticate("google", { scope: ["profile", "email"] }));
+router.route("/google/callback").get(googleCallback);
+router.route("/logout").get(logoutUser);
 
 export { router as authRoutes };

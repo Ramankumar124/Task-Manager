@@ -7,9 +7,11 @@ import { ApiResponse } from "../utils/ApiResponse";
 import jwt from "jsonwebtoken";
 import { deleteFromCloudinary, uploadToCloudinary } from "../utils/cloudnary";
 import logger from "../utils/logger";
+import passport from "../utils/passport";
 
+// Define a more flexible User interface for requests
 interface UserDataRequest extends Request {
-  user?: { email: string;id?: string };
+  user?: { email: string; id?: string } | any;
 }
 
 const accessTokenOptions = {
@@ -212,8 +214,6 @@ const logoutUser = asyncHandler(
 const updateAvatar = asyncHandler(
   async (req: UserDataRequest, res: Response, next: NextFunction) => {
     const user = await User.findById(req.user?.id);
-;
- 
     if (!user) {
       return next(new ApiError(404, "user not found"));
     }
@@ -244,7 +244,7 @@ const updateAvatar = asyncHandler(
     if (!uploadAvatar) {
       return next(new ApiError(400, "avatar upload failed"));
     }
- await deleteFromCloudinary(user?.avatar.public_id!);
+    await deleteFromCloudinary(user?.avatar.public_id!);
     const updatedUser = await User.findByIdAndUpdate(
       req.user?.id,
       {
@@ -291,7 +291,6 @@ const updateProfile = asyncHandler(
   async (req: UserDataRequest, res: Response, next: NextFunction) => {
     const { userName, email } = req.body;
 
-
     const user = await User.findById(req.user?.id);
     if (!user) {
       return next(new ApiError(404, "User not found"));
@@ -308,7 +307,6 @@ const updateProfile = asyncHandler(
       }
     }
 
-    // Update user data
     const updatedUser = await User.findByIdAndUpdate(
       req.user?.id,
       {
@@ -332,14 +330,34 @@ const updateProfile = asyncHandler(
       .json(new ApiResponse(200, updatedUser, "Profile updated successfully"));
   }
 );
-
+const googleCallback = asyncHandler(
+  async (req: UserDataRequest, res: Response, next: NextFunction) => {
+    passport.authenticate(
+      "google",
+      { session: false },
+      async (err: Error, user: any) => {
+        if (err || !user) {
+          return res.redirect(
+            `${process.env.CLIENT_URL}/login?error=authentication_failed`
+          );
+        }
+        const { accessToken, refreshToken } = await genrerateAccessAndRefreshToken(user._id);
+        return res
+          .status(200)
+          .cookie("accessToken", accessToken, accessTokenOptions)
+          .cookie("refreshToken", refreshToken, refreshTokenOptions)
+          .redirect(`${process.env.CLIENT_URL}/dashboard`);
+      }
+    )(req, res, next);
+  }
+);
 export {
   registerUser,
-
   logoutUser,
   loginUser,
   updateAvatar,
   updateProfile,
   userData,
   refreshAccessToken,
+  googleCallback,
 };

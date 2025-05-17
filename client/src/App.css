@@ -59,13 +59,12 @@
 }
 
 .form-select.to-do {
-    color: #6c757d;
-    border-color: #6c757d;
+    color: #d62c0a;
+    border-color: #e3390e;
 }
 
-/* Sidebar Navigation Styles */
 .sidebar .nav-link {
-    color: #495057;
+    color: inear-gradient(to right, #0062E6, #33AEFF);
     border-radius: 0.25rem;
     margin-bottom: 0.25rem;
     transition: all 0.2s ease;
@@ -104,7 +103,8 @@
 }
 
 .auth-page .nav-pills .nav-link {
-    color: #6c757d;
+    color: linear-gradient(to right, #0062E6, #33AEFF);
+
     font-weight: 500;
     padding: 0.75rem 1.5rem;
 }
