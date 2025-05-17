@@ -1,7 +1,7 @@
 import http from "http";
 import app from "./app";
 import dotenv from "dotenv";
-import { DBConnection } from "./database";
+import { DBConnection } from "./controller/database";
 dotenv.config();
 
 const PORT = process.env.PORT || 5000;
