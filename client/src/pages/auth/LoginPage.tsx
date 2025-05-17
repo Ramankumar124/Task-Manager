@@ -76,7 +76,7 @@ const LoginPage = () => {
                 type="button"
                 onClick={() =>
                   (window.location.href = `${
-                    import.meta.env.VITE_API_URL || "http://localhost:5000"
+                    import.meta.env.VITE_PUBLIC_BASE_URL || "http://localhost:5000"
                   }/api/auth/google`)
                 }
                 className="w-full bg-white text-gray-800 border border-gray-300  px-4 py-2  rounded-lg! hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
