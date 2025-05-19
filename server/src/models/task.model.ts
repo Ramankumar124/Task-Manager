@@ -6,8 +6,8 @@ interface ITask extends Document {
   description: string;
   priority: "High" | "Medium" | "Low";
   status: "To Do" | "In Progress" | "Completed";
-  userId: mongoose.Schema.Types.ObjectId; // Reference to the user who created the task
-  dueDate?: Date; // Optional due date
+  userId: mongoose.Schema.Types.ObjectId; 
+  dueDate?: Date; 
 }
 
 const taskSchema: Schema = new Schema<ITask>(

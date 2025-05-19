@@ -57,7 +57,6 @@ const RegisterPage = () => {
         toast.success(`${response?.data?.message}`);
         dispatch(setUserData(response?.data?.data));
         navigate("/dashboard");
-        console.log(response.data.data);
       }
     } catch (error: any) {
       toast.error(error?.response?.data?.message || error?.message);

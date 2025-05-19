@@ -7,7 +7,7 @@ import {
   Card,
   Spinner,
 } from "react-bootstrap";
-import { useForm } from "react-hook-form"; // Removed watch from here, it will be destructured below
+import { useForm } from "react-hook-form";
 import {
   useUpdateTaskMutation,
   useDeleteTaskMutation,
@@ -111,7 +111,6 @@ const EditTask = () => {
     }
   };
   const handleEnhanceWithAi = async () => {
-    console.log("Enhance task data:", enhanceTaskData);
     try {
       const rawData = await enhanceTask(enhanceTaskData).unwrap();
 

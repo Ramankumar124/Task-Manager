@@ -81,7 +81,7 @@ const Dashboard = () => {
       try {
         await deleteTask(taskToDelete).unwrap();
         toast.success("Task deleted successfully");
-      } catch (error:any) {
+      } catch (error: any) {
         toast.error("Failed to delete task");
       } finally {
         setShowDeleteModal(false);
@@ -138,10 +138,12 @@ const Dashboard = () => {
         <>
           <div className="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <div className="dashboard-header">
-                  <h3 className="text-md! md:text-4xl!">My Tasks</h3>
-                  <p className="text-muted mb-0 text-sm! md:text-lg!">Manage your tasks efficiently</p>
-                </div>
+              <div className="dashboard-header">
+                <h3 className="text-md! md:text-4xl!">My Tasks</h3>
+                <p className="text-muted mb-0 text-sm! md:text-lg!">
+                  Manage your tasks efficiently
+                </p>
+              </div>
             </div>
             <Button
               variant="primary"

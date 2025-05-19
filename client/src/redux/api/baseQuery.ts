@@ -3,7 +3,6 @@ import type { AxiosRequestConfig, AxiosError } from "axios";
 import Api from "../../Service/httpService";
 
 
-// Define the shape of the arguments for the custom base query
 type AxiosBaseQueryArgs = {
   url: string;
   method?: AxiosRequestConfig["method"];
@@ -12,13 +11,11 @@ type AxiosBaseQueryArgs = {
   credentials?: RequestCredentials;
 };
 
-// Define the shape of the error response
 type AxiosBaseQueryError = {
   status?: number;
   data?: unknown;
 };
 
-// Create a custom base query using Axios
 const axiosBaseQuery =
   (): BaseQueryFn<AxiosBaseQueryArgs, unknown, AxiosBaseQueryError> =>
   async ({ url, method = "GET", data, params }) => {
@@ -28,7 +25,7 @@ const axiosBaseQuery =
         method,
         data,
         params,
-        withCredentials: true, // Always include credentials
+        withCredentials: true,
       });
       return { data: result.data };
     } catch (axiosError) {

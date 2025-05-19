@@ -9,7 +9,6 @@ import { deleteFromCloudinary, uploadToCloudinary } from "../utils/cloudnary";
 import logger from "../utils/logger";
 import passport from "../utils/passport";
 
-// Define a more flexible User interface for requests
 interface UserDataRequest extends Request {
   user?: { email: string; id?: string } | any;
 }
@@ -41,7 +40,6 @@ const genrerateAccessAndRefreshToken = async (userId: string) => {
 
     return { accessToken, refreshToken };
   } catch (error: any) {
-    console.log(error?.message);
     throw new ApiError(500, "Something went wrong while gernrating tokens");
   }
 };
@@ -257,7 +255,7 @@ const updateAvatar = asyncHandler(
         new: true,
       }
     )
-      .select("-password -refreshToken") // Exclude the password field
+      .select("-password -refreshToken") 
       .populate("Tasks");
 
     if (!updatedUser) {
@@ -296,7 +294,6 @@ const updateProfile = asyncHandler(
       return next(new ApiError(404, "User not found"));
     }
 
-    // Check if email is already in use by another user
     if (email !== user.email) {
       const existingUser = await User.findOne({
         email,

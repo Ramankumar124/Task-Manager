@@ -2,6 +2,14 @@ import axios, { type AxiosRequestConfig, type AxiosResponse } from "axios";
 import properties from "../config/properties";
 import  { AxiosError } from "axios";
 
+interface ErrorType{
+  response:{
+    status:number,
+    data:{
+      message:string
+    }
+  }
+}
 const Api = axios.create({
   baseURL: `${properties?.BASE_URL}`,
   withCredentials: true,
@@ -16,9 +24,8 @@ Api.interceptors.response.use(
     const originalRequest = error.config as AxiosRequestConfig & {
       _retry?: boolean;
     };
-    console.log(error);
-    //@ts-ignore
-    if (error.response?.status === 401 && error?.response?.data?.message =="ACCESS_TOKEN_IS_MISSING" && !originalRequest._retry) {
+    const Error=error as ErrorType
+    if (Error.response?.status === 401 && Error?.response?.data?.message =="ACCESS_TOKEN_IS_MISSING" && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
         await axios.post(

@@ -5,10 +5,10 @@ import Task from "../models/task.model";
 import User from "../models/user.model";
 import { ApiError } from "../utils/ApiError";
 import { ApiResponse } from "../utils/ApiResponse";
-import redisClient from "../utils/redisClient"; // Added import for redisClient
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import redisClient from "../utils/redisClient"; 
 import { enhanceTaskByAi } from "../utils/aiAgent";
 import { systemPrompt } from "../constants/systemPrompt";
+
 const createTask = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { title, description, dueDate, priority, status } = req.body;
@@ -110,7 +110,6 @@ const getTaskById = asyncHandler(
 
 const updateTask = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log(req.body);
 
     const { id } = req.params;
     const { title, description, dueDate, priority, status } = req.body;
@@ -186,10 +185,6 @@ const enhanceTask = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
    
     const {title,description}=req.body;
-    console.log('====================================');
-    console.log(req.body);
-    console.log('====================================');
-    // Validate input
   
     const requestData = JSON.stringify({
       title,

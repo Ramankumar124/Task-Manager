@@ -1,4 +1,3 @@
-// This component displays a loading spinner
 import React from "react";
 
 const Spinner: React.FC = () => {

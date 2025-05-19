@@ -1,4 +1,3 @@
-//reterive baseUrl from .env file
 
 const properties = {
   BASE_URL:

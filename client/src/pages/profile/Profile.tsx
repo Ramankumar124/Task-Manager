@@ -78,14 +78,12 @@ const Profile = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Create preview
     const reader = new FileReader();
     reader.onloadend = () => {
       setPreviewImage(reader.result as string);
     };
     reader.readAsDataURL(file);
 
-    // Upload avatar
     const formData = new FormData();
     formData.append("avatar", file);
 

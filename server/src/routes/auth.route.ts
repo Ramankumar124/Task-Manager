@@ -20,6 +20,7 @@ import {
 import passport from "../utils/passport";
 
 const router = Router();
+
 router
   .route("/register")
   .post(

@@ -21,9 +21,7 @@ const uploadToCloudinary=async(filePath:string)=>{
         })
         fs.unlinkSync(filePath);
         return response
-    } catch (error:any) {
-      console.log("error uploading to cloud",error?.message);
-      
+    } catch (error:any) {      
         fs.unlinkSync(filePath) 
         return null;  
     }
