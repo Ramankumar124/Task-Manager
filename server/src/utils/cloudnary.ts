@@ -14,6 +14,8 @@ cloudinary.config({
 const uploadToCloudinary=async(filePath:string)=>{
     try {
         if(!filePath) return null;
+        console.log(filePath);
+        
 
         const response=await cloudinary.uploader.upload(filePath,{
             folder:"TaskManager",

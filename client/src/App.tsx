@@ -43,7 +43,6 @@ function App() {
           <Route path="register" element={<RegisterPage />} />
         </Route>
 
-        {/* Protected routes with sidebar */}
         <Route element={<ProtectedRoute user={user} />}>
           <Route path="/" element={<MainLayout />}>
             <Route index element={<Dashboard />} />

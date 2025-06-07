@@ -8,6 +8,7 @@ type AxiosBaseQueryArgs = {
   method?: AxiosRequestConfig["method"];
   data?: AxiosRequestConfig["data"];
   params?: AxiosRequestConfig["params"];
+  headers?: AxiosRequestConfig["headers"];
   credentials?: RequestCredentials;
 };
 
@@ -18,13 +19,14 @@ type AxiosBaseQueryError = {
 
 const axiosBaseQuery =
   (): BaseQueryFn<AxiosBaseQueryArgs, unknown, AxiosBaseQueryError> =>
-  async ({ url, method = "GET", data, params }) => {
+  async ({ url, method = "GET", data, params ,headers}) => {
     try {
       const result = await Api({
         url,
         method,
         data,
         params,
+        headers,
         withCredentials: true,
       });
       return { data: result.data };
